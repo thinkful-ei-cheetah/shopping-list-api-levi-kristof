@@ -3,17 +3,24 @@
 
 $(document).ready(function() {
   shoppingList.bindEventListeners();
+
+  api.getItems()
+    .then(res => res.json())
+    .then((items) => {
+      items.forEach((item) => store.addItem(item));
+      shoppingList.render();
+    });
   shoppingList.render();
+
 });
 
-store.items.push(Item.create('apples'));
-
-api.createItem('pears')
-  .then(res => res.json())
-  .then((newItem) => {
-    return api.getItems();
-  })
+api.getItems()
   .then(res => res.json())
   .then((items) => {
-    console.log(items);
-  });
+    const item = items[1];
+    return api.updateItem(item.id, { 
+      name: 'foobar' 
+    });
+  })
+  .then(res => res.json())
+  .then(() => console.log('updated!'));

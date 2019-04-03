@@ -1,4 +1,5 @@
-/* global store, $ */
+'use strict';
+/* global store, $, api */
 
 // eslint-disable-next-line no-unused-vars
 const shoppingList = (function(){
@@ -55,7 +56,7 @@ const shoppingList = (function(){
     // render the shopping list in the DOM
     console.log('`render` ran');
     const shoppingListItemsString = generateShoppingItemsString(items);
-  
+    
     // insert that HTML into the DOM
     $('.js-shopping-list').html(shoppingListItemsString);
   }
@@ -66,9 +67,17 @@ const shoppingList = (function(){
       event.preventDefault();
       const newItemName = $('.js-shopping-list-entry').val();
       $('.js-shopping-list-entry').val('');
-      store.addItem(newItemName);
-      render();
+      
+      api.createItem(newItemName)
+        .then(res => res.json())
+        .then(item =>{
+          store.addItem(item);
+          render();
+        });
+        
+      
     });
+    
   }
   
   function getItemIdFromElement(item) {
