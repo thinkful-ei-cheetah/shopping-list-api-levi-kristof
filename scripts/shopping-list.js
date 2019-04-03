@@ -43,22 +43,30 @@ const shoppingList = (function(){
   
   function render() {
     // Filter item list if store prop is true by item.checked === false
-    let items = [ ...store.items ];
-    if (store.hideCheckedItems) {
-      items = items.filter(item => !item.checked);
+    if (store.error) {
+      $(".error-snackbar").html(store.error.message);
+      console.log(`render ran ` + store.error.message);
     }
-  
-    // Filter item list if store prop `searchTerm` is not empty
-    if (store.searchTerm) {
-      items = items.filter(item => item.name.includes(store.searchTerm));
-    }
-  
-    // render the shopping list in the DOM
-    console.log('`render` ran');
-    const shoppingListItemsString = generateShoppingItemsString(items);
+
+    else {
+      $(".error-snackbar").html('');
+      let items = [ ...store.items ];
+      if (store.hideCheckedItems) {
+        items = items.filter(item => !item.checked);
+      }
     
-    // insert that HTML into the DOM
-    $('.js-shopping-list').html(shoppingListItemsString);
+      // Filter item list if store prop `searchTerm` is not empty
+      if (store.searchTerm) {
+        items = items.filter(item => item.name.includes(store.searchTerm));
+      }
+    
+      // render the shopping list in the DOM
+      console.log('`render` ran');
+      const shoppingListItemsString = generateShoppingItemsString(items);
+      
+      // insert that HTML into the DOM
+      $('.js-shopping-list').html(shoppingListItemsString);
+    }
   }
   
   
@@ -67,12 +75,19 @@ const shoppingList = (function(){
       event.preventDefault();
       const newItemName = $('.js-shopping-list-entry').val();
       $('.js-shopping-list-entry').val('');
+
+      store.error = null;
       
       api.createItem(newItemName)
-        .then(res => res.json())
         .then(item =>{
           store.addItem(item);
           render();
+        })
+        .catch(error => {
+          store.error = error;
+          console.log(store.error);
+          render();
+          store.error = null;
         });
         
       
@@ -100,9 +115,18 @@ const shoppingList = (function(){
       // get the index of the item in store.items
       const id = getItemIdFromElement(event.currentTarget);
       // delete the item
-      store.findAndDelete(id);
-      // render the updated shopping list
-      render();
+      api.deleteItem(id)
+        .then(response => {
+          console.log(response);
+          store.findAndDelete(id);
+          render();
+        })
+        .catch(error => {
+          store.error = error;
+          console.log(store.error);
+          render();
+          store.error = null;
+        });
     });
   }
   
@@ -110,10 +134,19 @@ const shoppingList = (function(){
     $('.js-shopping-list').on('submit', '.js-edit-item', event => {
       event.preventDefault();
       const id = getItemIdFromElement(event.currentTarget);
-      const itemName = $(event.currentTarget).find('.shopping-item').val();
-      store.findAndUpdateName(id, itemName);
-      store.setItemIsEditing(id, false);
-      render();
+      const newName = $(event.currentTarget).find('.shopping-item').val();
+      api.updateItem(id, {name: newName})
+        .then(response => {
+          console.log(response);
+          store.findAndUpdate(id, {name: newName});
+          render();
+        })
+        .catch(error => {
+          store.error = error;
+          console.log(store.error);
+          render();
+          store.error = null;
+        });
     });
   }
   

@@ -6,7 +6,7 @@ const api = (function (){
   const BASE_URL = 'https://thinkful-list-api.herokuapp.com/levi-kristof';
 
   function getItems(){
-    return fetch(BASE_URL + '/items');
+    return listApiFetch(BASE_URL + '/items');
   }
 
   function createItem(name) {
@@ -21,10 +21,10 @@ const api = (function (){
       body: newItem
     };
 
-    return fetch(BASE_URL + '/items', options);
+    return listApiFetch(BASE_URL + '/items', options);
   }
 
-  function updateItem (id, updateData){
+  function updateItem(id, updateData){
 
     const options = {
       method: 'PATCH',
@@ -34,13 +34,43 @@ const api = (function (){
       body: JSON.stringify(updateData)
     };
 
-    return fetch(BASE_URL + `/items/${id}`, options);
+    return listApiFetch(BASE_URL + `/items/${id}`, options);
+  }
+
+  function deleteItem(id) {
+    const options = {
+      method: 'DELETE',
+      headers: new Headers({
+        'Content-Type': 'application/json'
+      }),
+    };
+    return listApiFetch(BASE_URL + `/items/${id}`, options);
+  }
+
+  function listApiFetch(...args) {
+    let error;
+    return fetch(...args)
+      .then(res => {
+        if (!res.ok) {
+          error = { code: res.status};
+        }
+        return res.json();
+      })
+      .then(data => {
+        if (error) {
+          error.message =  data.message;
+          return Promise.reject(error);
+        }
+        return data;
+      });
   }
 
   return {
     getItems,
     createItem,
     updateItem,
+    deleteItem,
+    listApiFetch,
   };
 
 }() );

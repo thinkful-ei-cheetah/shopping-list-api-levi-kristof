@@ -5,22 +5,12 @@ $(document).ready(function() {
   shoppingList.bindEventListeners();
 
   api.getItems()
-    .then(res => res.json())
     .then((items) => {
       items.forEach((item) => store.addItem(item));
       shoppingList.render();
-    });
+    })
+    .catch(error => console.log(error));
+  
   shoppingList.render();
 
 });
-
-api.getItems()
-  .then(res => res.json())
-  .then((items) => {
-    const item = items[1];
-    return api.updateItem(item.id, { 
-      name: 'foobar' 
-    });
-  })
-  .then(res => res.json())
-  .then(() => console.log('updated!'));

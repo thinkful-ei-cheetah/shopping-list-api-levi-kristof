@@ -17,13 +17,13 @@ const store = (function(){
 
 
   const findAndDelete = function(id) {
-    this.items = this.items.filter(item => item.id !== id);
+    const itemIndex = this.items.findIndex(item => item.id === id);
+    this.items.splice(itemIndex, 1);
   };
 
-  // const findAndUpdate = function(id, newData){
-  //   const item = 
-
-  // }
+  const findAndUpdate = function(id, newData) {
+      Object.assign(store.items.find(item => item.id === id), newData);
+  };
 
   const toggleCheckedFilter = function() {
     this.hideCheckedItems = !this.hideCheckedItems;
@@ -38,10 +38,17 @@ const store = (function(){
     this.searchTerm = term;
   };
 
+  const setError = function() {
+    
+  }
+
+  let error = null;
+
   return {
     items: [],
     hideCheckedItems: false,
     searchTerm: '',
+    error,
 
     addItem,
     findById,
@@ -50,6 +57,7 @@ const store = (function(){
     toggleCheckedFilter,
     setSearchTerm,
     setItemIsEditing,
+    setError,
   };
   
 }());
