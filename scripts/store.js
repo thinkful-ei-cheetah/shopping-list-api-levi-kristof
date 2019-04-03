@@ -5,7 +5,6 @@
 const store = (function(){
   const addItem = function(item) {
     try {
-      console.log(this);
       store.items.push(item);
     } catch(e) {
       console.log(e.message);
