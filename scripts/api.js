@@ -9,10 +9,10 @@ const api = (function (){
     return fetch(BASE_URL + '/items');
   }
 
-  function createItem (name){
+  function createItem(name) {
 
     const newItem = JSON.stringify({name});
-
+    
     const options = {
       method: 'POST',
       headers: new Headers({
@@ -21,7 +21,7 @@ const api = (function (){
       body: newItem
     };
 
-    fetch(BASE_URL + '/item', options);
+    return fetch(BASE_URL + '/items', options);
   }
 
   return {
