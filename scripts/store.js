@@ -40,7 +40,7 @@ const store = (function(){
 
   const setError = function() {
     
-  }
+  };
 
   let error = null;
 
